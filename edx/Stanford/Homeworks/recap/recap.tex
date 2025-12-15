@@ -1,0 +1,190 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+% Page Setup
+\geometry{a4paper, margin=1in}
+\pagestyle{fancy}
+\lhead{Algorithms Illuminated: Parts 1 \& 2}
+\rhead{Advanced Revision Notes}
+
+% Custom Environments
+\newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{example}{Example}
+\newtheorem{challenge}{Challenge Problem}
+\newtheorem{solution}{Solution}
+
+% Macros
+\newcommand{\Ocal}{\mathcal{O}}
+\newcommand{\ThetaCal}{\Theta}
+\newcommand{\OmegaCal}{\Omega}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{\textbf{Algorithms Illuminated: Comprehensive Revision Notes}\\ \large Includes Advanced Examples \& Exam Problems}
+\author{Guided Summary based on Tim Roughgarden's Textbooks}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Part 1: Asymptotic Analysis \& Divide and Conquer}
+
+\subsection{1. Asymptotic Notation (The Language of Algorithms)}
+We analyze algorithms by bounding their running time $T(n)$ as input size $n \to \infty$.
+
+\begin{itemize}
+    \item \textbf{Big-O ($T(n) = \Ocal(f(n))$):} Upper bound. $T(n) \le c \cdot f(n)$ for large $n$.
+    \item \textbf{Big-Omega ($T(n) = \OmegaCal(f(n))$):} Lower bound. $T(n) \ge c \cdot f(n)$.
+    \item \textbf{Big-Theta ($T(n) = \ThetaCal(f(n))$):} Tight bound. Limits exist on both sides.
+\end{itemize}
+
+\begin{example}[Ranking Functions]
+    Rank the following from slowest to fastest growth:
+    \[ n^2, \quad n \log n, \quad n!, \quad 2^n, \quad \sqrt{n}, \quad n^{1.5} \]
+    \textbf{Order:} $\sqrt{n} < n \log n < n^{1.5} < n^2 < 2^n < n!$.
+\end{example}
+
+\subsection{2. The Master Method}
+Used for recurrences $T(n) = a T(n/b) + \Ocal(n^d)$. Compare $a$ (subproblem proliferation) vs. $b^d$ (work reduction rate).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llp{6cm}@{}}
+\toprule
+\textbf{Case} & \textbf{Condition} & \textbf{Result} \\ \midrule
+1 & $a = b^d$ & $T(n) = \Ocal(n^d \log n)$ \\
+2 & $a < b^d$ & $T(n) = \Ocal(n^d)$ (Work at root dominates) \\
+3 & $a > b^d$ & $T(n) = \Ocal(n^{\log_b a})$ (Work at leaves dominates) \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{example}[Strassen's Matrix Multiplication]
+    Recurrence: $T(n) = 7T(n/2) + \Ocal(n^2)$.
+    Here $a=7, b=2, d=2$. Since $7 > 2^2=4$, we are in \textbf{Case 3}.
+    \[ T(n) = \Ocal(n^{\log_2 7}) \approx \Ocal(n^{2.81}) \]
+    This beats the naive $\Ocal(n^3)$ algorithm.
+\end{example}
+
+\subsection{3. QuickSort Analysis}
+\begin{itemize}
+    \item \textbf{Randomized Pivot:} Guarantees $\Ocal(n \log n)$ \textit{expected} time.
+    \item \textbf{Key Insight:} The running time is proportional to the number of comparisons. Two elements $z_i$ and $z_j$ are compared iff one of them is chosen as a pivot while they are still in the same sub-array.
+    \item \textbf{Probability:} $P(\text{compare } z_i, z_j) = \frac{2}{j-i+1}$.
+\end{itemize}
+
+\section{Part 2: Graph Algorithms}
+
+\subsection{4. Graph Search (BFS \& DFS)}
+\begin{itemize}
+    \item \textbf{BFS (Layers):} Finds shortest paths in unweighted graphs. Computes Connected Components in $\Ocal(m+n)$.
+    \item \textbf{DFS (Backtracking):} Computes Topological Sort and Strongly Connected Components (SCCs).
+\end{itemize}
+
+\subsection{5. Dijkstra's Algorithm}
+Finds shortest paths from $s$ with \textbf{non-negative edge lengths} $l_e \ge 0$.
+\begin{itemize}
+    \item \textbf{Greedy Criterion:} Maintain processed set $X$. Always extract $v \notin X$ minimizing:
+    \[ \text{Score}(v) = \min_{u \in X, (u,v) \in E} \{ A[u] + l_{uv} \} \]
+    \item \textbf{Implementation:} Use a Heap. Store vertices with keys = Dijkstra Score.
+    \item \textbf{Runtime:} $\Ocal(m \log n)$ with binary heap.
+\end{itemize}
+
+\section{Advanced Exam Questions (ETH / Stanford Style)}
+\textit{These questions test algorithmic design and deep conceptual understanding rather than rote application.}
+
+\subsection{Question 1: The "Unimodal" Maximum (Divide \& Conquer)}
+\textbf{Problem:} You are given an array $A$ of $n$ distinct integers. The array is "unimodal": it increases up to a maximum and then decreases. (e.g., $[1, 3, 8, 12, 9, 4, 2]$). Design an $\Ocal(\log n)$ algorithm to find the maximum element.
+
+\begin{solution}
+    We cannot scan the array ($\Ocal(n)$). We must use a Binary Search variation.
+    \begin{enumerate}
+        \item Pick the middle element $m$ at index $n/2$.
+        \item Look at its neighbors $m-1$ and $m+1$.
+        \item \textbf{Case A:} If $A[m-1] < A[m] < A[m+1]$, the peak is to the \textbf{right}. Recurse on right half.
+        \item \textbf{Case B:} If $A[m-1] > A[m] > A[m+1]$, the peak is to the \textbf{left}. Recurse on left half.
+        \item \textbf{Case C:} If $A[m-1] < A[m]$ and $A[m] > A[m+1]$, then $A[m]$ is the peak. Return it.
+    \end{enumerate}
+    \textbf{Time:} $T(n) = T(n/2) + \Ocal(1) \implies \Ocal(\log n)$.
+\end{solution}
+
+\subsection{Question 2: Bipartite Checking (Graph Search)}
+\textbf{Problem:} A graph is bipartite if its vertices can be split into two sets $V_1, V_2$ such that every edge connects a node in $V_1$ to one in $V_2$ (i.e., 2-colorable). Design an $\Ocal(m+n)$ algorithm to determine if a connected undirected graph is bipartite.
+
+\begin{solution}
+    Use BFS (Breadth-First Search).
+    \begin{enumerate}
+        \item Run BFS starting from arbitrary node $s$.
+        \item Assign $s$ to "Layer 0". All neighbors of $s$ are "Layer 1", their neighbors "Layer 2", etc.
+        \item \textbf{Coloring Rule:} Nodes in even layers get Color A. Nodes in odd layers get Color B.
+        \item \textbf{Check:} Iterate through all edges $(u, v)$. If $u$ and $v$ have the \textit{same} color (i.e., belong to the same layer parity), the graph is \textbf{not} bipartite.
+        \item If the check passes for all edges, it is bipartite.
+    \end{enumerate}
+    \textbf{Proof Intuition:} A graph is bipartite iff it contains no odd cycles. BFS layers detect odd cycles effectively.
+\end{solution}
+
+\subsection{Question 3: The "Bottleneck" Path (Modified Dijkstra)}
+\textbf{Problem:} Instead of minimizing the \textit{sum} of edge weights, we want to maximize the \textit{capacity} of the path. The capacity of a path is defined as the \textbf{minimum} edge weight along that path. Find the path from $s$ to $t$ that maximizes this bottleneck capacity.
+
+\begin{solution}
+    Modify Dijkstra's Algorithm.
+    \begin{itemize}
+        \item \textbf{Score Definition:} Instead of $A[v] = \text{dist}(s,v)$, let $W[v]$ be the max-capacity to reach $v$.
+        \item \textbf{Initialization:} $W[s] = \infty$, all others $-\infty$.
+        \item \textbf{Greedy Step:} Pick $v \notin X$ with the \textbf{maximum} $W[v]$.
+        \item \textbf{Relaxation:} When considering edge $(u, v)$, the candidate capacity is $\min(W[u], \text{weight}_{uv})$.
+        \item \textbf{Update:} If $\min(W[u], \text{weight}_{uv}) > W[v]$, update $W[v]$.
+    \end{itemize}
+    This is effectively Prim's algorithm for Maximum Spanning Tree adapted for single-path queries.
+\end{solution}
+
+\subsection{Question 4: True/False "Gotchas"}
+\begin{enumerate}
+    \item \textbf{Statement:} "DFS always finds the shortest path in an unweighted graph."
+    \item[] \textbf{Answer:} \textbf{False}. DFS goes deep. It might find a path of length 10 before finding a neighbor of length 1. BFS is required for shortest paths in unweighted graphs.
+
+    \item \textbf{Statement:} "If we square every edge weight ($l_e^2$), the shortest path remains the same."
+    \item[] \textbf{Answer:} \textbf{False}. Squaring penalizes large weights disproportionately.
+    \\ \textit{Ex:} Path A edges: $2, 2$ (Sum 4). Path B edge: $3$ (Sum 3). B is shorter.
+    \\ Squared: A becomes $4+4=8$. B becomes $9$. A is now shorter.
+
+    \item \textbf{Statement:} "In a DAG (Directed Acyclic Graph), we can find shortest paths even with negative edge weights in $\Ocal(m+n)$."
+    \item[] \textbf{Answer:} \textbf{True}. We can process vertices in \textbf{Topological Order}. Since there are no cycles, we relax edges in one linear pass, avoiding the infinite loops that negative cycles cause in general graphs.
+\end{enumerate}
+
+\section{Essential Proofs to Memorize}
+
+\subsection{Correctness of Dijkstra}
+\textbf{Theorem:} Dijkstra's algorithm correctly computes shortest paths if $l_e \ge 0$.
+\begin{proof}
+    By induction on the size of set $X$.
+    \begin{itemize}
+        \item Base case: $|X|=1$ ($s$ is correct).
+        \item Inductive step: Suppose all $u \in X$ have correct distances $A[u]$. Let $v$ be the next node added via edge $(u^*, v)$.
+        \item Any other path to $v$ must leave $X$ via some other edge $(y, z)$.
+        \item Length of other path $\ge A[y] + l_{yz}$.
+        \item By the greedy choice, $A[u^*] + l_{u^*v} \le A[y] + l_{yz}$.
+        \item Since edge weights are non-negative, the path cannot get shorter after leaving $X$. Thus, the greedy path is optimal.
+    \end{itemize}
+\end{proof}
+
+\subsection{Master Method Case 2 (Intuition)}
+Why is $T(n) = \Ocal(n^d \log n)$ when $a = b^d$?
+\begin{proof}
+    The work at depth $j$ is $a^j \times c(\frac{n}{b^j})^d$.
+    Substituting $a = b^d$, the terms cancel out:
+    \[ \text{Work}_j = (b^d)^j \cdot c \frac{n^d}{(b^j)^d} = b^{dj} \cdot c \frac{n^d}{b^{dj}} = c \cdot n^d \]
+    The work at \textbf{every level} is the same ($cn^d$). Since there are $\log_b n$ levels, total work is $\Ocal(n^d \log n)$.
+\end{proof}
+
+\end{document}
