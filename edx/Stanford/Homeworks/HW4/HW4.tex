@@ -29,71 +29,204 @@
 \begin{enumerate}
 
     % Problem 1 --------------------------------------------------------------
-    \item Given an adjacency-list representation of a directed graph, where each vertex maintains an array of its outgoing edges (but *not* its incoming edges), how long does it take, in the worst case, to compute the in-degree of a given vertex?
+    \item Given an adjacency-list representation of a directed graph, where each vertex maintains an array of its outgoing edges (but *not* its incoming edges), how long does it take, in the worst case, to compute the in-degree of a given vertex? As usual, we use $n$ and $m$ to denote the number of vertices and edges, respectively, of the given graph. Also, let $k$ denote the maximum in-degree of a vertex. (Recall that the in-degree of a vertex is the number of edges that enter it.)
 
-        As usual, we use $n$ and $m$ to denote the number of vertices and edges, respectively, of the given graph. Also, let $k$ denote the maximum in-degree of a vertex. (Recall that the in-degree of a vertex is the number of edges that enter it.)
+          \begin{enumerate}
+              \item $\theta(m)$
+          \end{enumerate}
 
-        \begin{enumerate}
-            \item $\theta(m)$  
-        \end{enumerate}
-
-    % Problem 2 --------------------------------------------------------------
+          % Problem 2 --------------------------------------------------------------
     \item Consider the following problem: given an undirected graph G with n vertices and m edges, and two vertices s and t, does there exist at least one s-t path?
 
-        If G is given in its adjacency list representation, then the above problem can be solved in O(m + n) time, using BFS or DFS. (Make sure you see why this is true.)
+          If G is given in its adjacency list representation, then the above problem can be solved in O(m + n) time, using BFS or DFS. (Make sure you see why this is true.)
 
-        Suppose instead that G is given in its adjacency \textbf {matrix}. What running time is required, in the worst case, to solve the computational problem stated above? (Assume that G has no parallel edges.)
-        \begin{enumerate}
-            \item \textbf{Answer:}  $\theta(n^2)$ 
+          Suppose instead that G is given in its adjacency \textbf {matrix}. What running time is required, in the worst case, to solve the computational problem stated above? (Assume that G has no parallel edges.)
+          \begin{enumerate}
+              \item \textbf{Answer:}  $\theta(n^2)$
 
-                \textbf{Explanation:} One line: when you run BFS/DFS on a list, you touch each vertex once and each edge at most twice $\longrightarrow$ time $O(m+n)$.
+                    \textbf{Explanation:}
 
-                For the lower bound, observe that you might need to look at every entry of the adjacency matrix (e.g., if it has only one "1" and the rest are zeroes). One easy way to prove the upper bound is to first build an adjacency list representation (in $\theta(n^2)$ time, with a single scan over the given adjacency matrix) and then run BFS or DFS as in the video lectures.
-                
-                \bigskip
+                    \textit{Quick Summary:} When you run BFS/DFS on a list, you touch each vertex once and each edge at most twice $\longrightarrow$ time $O(m+n)$. Below is the detailed breakdown of why this is true:
 
-                The adjacency list representation yields asymptotically faster BFS/DFS on sparse graphs, since even in the worst case
-                \[
-                    \Theta(m+n)=\Theta(n+n)=\Theta(n) \;<\; \Theta(n^2),
-                \]
-                where the \(\Theta(n^2)\) bound corresponds to scanning all rows in an \(n\times n\) adjacency matrix.
+                    \smallskip
 
-                \textbf{Quick summary:} 
-                \begin{enumerate}
-                    \item \textbf{Adjacency List:} BFS/DFS = $\theta(O^{m+n})$
-                    \item \textbf{Adjacency Matrix:} BFS/DFS = $\theta(O^{n^2})$
-                \end{enumerate}
+                    \textbf{1. The ``Contact List'' Analogy} \\
+                    Imagine the Adjacency List as a physical address book.
+                    \begin{itemize}
+                        \item \textbf{Vertices ($n$):} The names of people in the book (Alice, Bob, Charlie...).
+                        \item \textbf{Edges ($m$):} The phone numbers written next to each name.
+                    \end{itemize}
+                    In an undirected graph, if Alice is friends with Bob, Bob's number is next to Alice's name, \textit{and} Alice's number is next to Bob's name.
 
-        \end{enumerate}
+                    \smallskip
 
+                    \textbf{2. Tracing the Algorithm (The ``Touch'')} \\
+                    When BFS/DFS visits a vertex $u$, it iterates through neighbors:
+                    \begin{verbatim}
+                for neighbor in Adj[u]:
+                    if neighbor is not visited:
+                        visit(neighbor)
+                \end{verbatim}
+                    This is where the ``touching'' happens:
+                    \begin{itemize}
+                        \item \textbf{Touch \#1:} When processing \textbf{Alice}, we scan her list and see ``Bob''. We check if he is visited. We have ``touched'' edge $(\text{Alice}, \text{Bob})$ once.
+                        \item \textbf{Touch \#2:} Later, when processing \textbf{Bob}, we scan his list and see ``Alice''. We check her status. We have ``touched'' edge $(\text{Alice}, \text{Bob})$ a second time.
+                    \end{itemize}
+                    Since the edge exists in only two places in memory, the code cannot iterate over it more than twice.
 
-    % Problem 3 --------------------------------------------------------------
+                    \smallskip
+
+                    \textbf{3. The Mathematical Proof}
+
+                    The total work is the sum of the degrees of all vertices.
+
+                    By the Handshaking Lemma, $\sum_{v \in V} \text{deg}(v) = 2m$.
+                    Thus, Total Time = $O(n \text{ for vertices}) + O(2m \text{ for edges}) \longrightarrow O(n + m)$.
+
+                    \bigskip
+                    \hrule
+                    \bigskip
+
+                    \textbf{Regarding the Adjacency Matrix (The actual question):} \\
+                    For the lower bound, observe that you might need to look at every entry of the adjacency matrix (e.g., if it has only one "1" and the rest are zeroes). One easy way to prove the upper bound is to first build an adjacency list representation (in $\theta(n^2)$ time, with a single scan over the given adjacency matrix) and then run BFS or DFS as in the video lectures.
+
+                    The adjacency list representation yields asymptotically faster BFS/DFS on sparse graphs, since even in the worst case
+                    \[
+                        \Theta(m+n)=\Theta(n+n)=\Theta(n) \;<\; \Theta(n^2),
+                    \]
+                    where the \(\Theta(n^2)\) bound corresponds to scanning all rows in an \(n\times n\) adjacency matrix.
+
+                    \textbf{Quick summary:}
+                    \begin{enumerate}
+                        \item \textbf{Adjacency List:} BFS/DFS = $\Theta(m+n)$
+                        \item \textbf{Adjacency Matrix:} BFS/DFS = $\Theta(n^2)$
+                    \end{enumerate}
+
+          \end{enumerate}
+
+          % Problem 3 --------------------------------------------------------------
     \item Consider the following problem: given an undirected graph G with n vertices and m edges, and two vertices s and t, does there exist at least one s-t path?
 
-        \begin{enumerate}
-            \item \textbf{}
-                \textbf{}
-        \end{enumerate}
-    
-    % Problem 4 --------------------------------------------------------------
+          \textbf{Relationship between Radius ($r$) and Diameter ($d$)}
+
+          \textbf{Definitions:}
+          \begin{itemize}
+              \item Let $d$ be the \textbf{diameter} of the graph: $d = \max_{s,t} \text{dist}(s,t)$.
+              \item Let $l(s)$ be the maximum distance from vertex $s$ to any other vertex: $l(s) = \max_{t} \text{dist}(s,t)$.
+              \item Let $r$ be the \textbf{radius} of the graph: $r = \min_{s} l(s)$.
+          \end{itemize}
+
+          \subsection*{Claim 1: $r \le d$}
+          \textbf{Proof:}
+          By definition, $l(s)$ represents the distance from $s$ to its farthest node. The radius $r$ is simply the value $l(c)$ for some central node $c$. Since the diameter $d$ is the maximum distance between \textit{any} pair of nodes in the entire graph, no single shortest path (including the one defining $r$) can exceed $d$.
+          \[
+              r = \min_{s} (\max_{t} \text{dist}(s,t)) \le \max_{s,t} \text{dist}(s,t) = d
+          \]
+          Thus, $\boxed{r \le d}$.
+
+          \subsection*{Claim 2: $r \ge d/2$}
+          \textbf{Proof:}
+          Let $u$ and $v$ be the endpoints of a diametral path, such that $\text{dist}(u,v) = d$.
+          Let $c$ be a center vertex of the graph such that $l(c) = r$.
+
+          By the definition of radius, the distance from the center $c$ to any node is at most $r$. Therefore:
+          \[
+              \text{dist}(c, u) \le r \quad \text{and} \quad \text{dist}(c, v) \le r
+          \]
+          By the Triangle Inequality, the shortest path between $u$ and $v$ cannot be longer than the path from $u$ to $c$ plus the path from $c$ to $v$:
+          \[
+              \text{dist}(u, v) \le \text{dist}(u, c) + \text{dist}(c, v)
+          \]
+          Substituting the known values:
+          \[
+              d \le r + r
+          \]
+          \[
+              d \le 2r \implies \boxed{r \ge d/2}
+          \]
+
+          \textbf{Conclusion:}
+          The inequalities that always hold are $r \le d$ and $r \ge d/2$.
+
+          % Problem 4 --------------------------------------------------------------
+
     \item Consider our algorithm for computing a topological ordering that is based on depth-first search (i.e., NOT the "straightforward solution"). Suppose we run this algorithm on a graph G that is NOT directed acyclic. Obviously it won't compute a topological order (since none exist). Does it compute an ordering that minimizes the number of edges that go backward? For example, consider the four-node graph with the six directed edges (s, v), (s, w), (v, w), (v, t), (w, t), (t, s). Suppose the vertices are ordered s, v, w, t. Then there is one backwards arc, the (t, s) arc. No ordering of the vertices has zero backwards arcs, and some have more than one.
 
-        \begin{enumerate}
-            \item \textbf{Answer:} Sometimes yes, sometimes no
-                \textbf{Explanation:} 
-        \end{enumerate}
-    
-    % Add a heading for Programming Assignment 4
-    \item \textbf{Programming Assignment 4}
-        \begin{enumerate}
-            \item \textbf{
-                Part 1: Topological Sort}
-                
-                Hello
+          \begin{enumerate}
+              \item \textbf{Answer:} Sometimes yes, sometimes no
+
+                    \textbf{Explanation:}
+                    The DFS-based algorithm is \textbf{not} guaranteed to minimize the number of backward edges. There are two main reasons for this:
+
+                    \begin{enumerate}
+                        \item \textbf{Computational Complexity Argument:}
+                              The problem of finding an ordering that minimizes the number of backward edges is equivalent to the \textbf{Minimum Feedback Arc Set} problem. This problem is known to be \textbf{NP-hard}. Since the DFS-based topological sort runs in linear time $O(m+n)$, it cannot possibly solve an NP-hard problem optimally in all cases (unless $P=NP$).
+
+                        \item \textbf{Good example where DFS suceeds}
+
+                              Consider a simple directed graph with edges: $(A, B), (B, C), (C, A)$.
+
+                              \begin{itemize}
+                                  \item \textbf{Optimal Ordering:} The ordering $A, B, C$ results in exactly \textbf{1 backward arc} $(C, A)$.
+                                  \item \textbf{DFS Run:} Suppose we run DFS starting at vertex $A$.
+                                        \begin{itemize}
+                                            \item DFS visits $A \to B \to C$.
+                                            \item From $C$, the only neighbor is $A$, which is already on the recursion stack (gray).
+                                            \item DFS backtracks. The finish times would be ordered: $C$ finishes first, then $B$, then $A$.
+                                            \item The resulting topological ordering (reverse finish times) is: $\mathbf{A, B, C}$.
+                                        \end{itemize}
+
+                                        Let us count the backward arcs in this specific DFS-generated ordering ($A, B, C$):
+                                        \begin{itemize}
+                                            \item $(C, A)$: $C$ comes after $A$. \textbf{Backward}.
+                                            \item $(A, B), (B, C)$: Both forward.
+                                        \end{itemize}
+
+                                        This ordering has \textbf{1 backward arc}, which matches the optimal. In this case, DFS succeeded in finding the optimal ordering.
+                              \end{itemize}
+
+                        \item \textbf{Counter-Example (using the graph provided):}
+
+                              Consider the graph $G$ with edges $(s, v), (s, w), (v, w), (v, t), (w, t), (t, s)$.
+
+                              \begin{itemize}
+                                  \item \textbf{Optimal Ordering:} As stated in the problem, the ordering $s, v, w, t$ results in exactly \textbf{1 backward arc} $(t, s)$.
+
+                                  \item \textbf{A "Bad" DFS Run:} Suppose we run DFS starting at vertex $t$.
+                                        \begin{itemize}
+                                            \item DFS visits $t \to s \to v \to w$.
+                                            \item From $w$, the only neighbor is $t$, which is already on the recursion stack (gray).
+                                            \item DFS backtracks. The finish times would be ordered: $w$ finishes first, then $v$, then $s$, then $t$.
+                                            \item The resulting topological ordering (reverse finish times) is: $\mathbf{t, s, v, w}$.
+                                        \end{itemize}
+
+                                        Let us count the backward arcs in this specific DFS-generated ordering ($t, s, v, w$):
+                                        \begin{itemize}
+                                            \item $(v, t)$: $v$ comes after $t$. \textbf{Backward}.
+                                            \item $(w, t)$: $w$ comes after $t$. \textbf{Backward}.
+                                            \item $(t, s), (s, v), (s, w), (v, w)$: All forward.
+                                        \end{itemize}
+
+                                        This ordering has \textbf{2 backward arcs}. Since $2 > 1$, the DFS algorithm failed to find the optimal ordering.
+                              \end{itemize}
+
+                        \item \textbf{Explanation of the Counter Example}
+                              \begin{itemize}
+                                  \item  The Goal: We want an order tha respect the arrows as much as possible.
+                                  \item The Optimal: The ordering $s, v, w, t$ has only 1 backward edge $(t, s)$. The cost is 1.
+                                  \item DFS Failure: DFS is sensitive to the starting point. Starting at $t$ leads to the ordering $t, s, v, w$, which has 2 backward edges: $(v, t)$ and $(w, t)$. The cost is 2.
+                                  \item Conclusion: Since DFS can produce an ordering with more backward edges than the optimal, it does not always minimize backward edges.
+                              \end{itemize}
+                    \end{enumerate}
+          \end{enumerate}
 
 
-                \textbf{Completed Solution}
-        \end{enumerate}
+    \item On adding one extra edge to a directed graph G, the number of strongly connected components...?
+
+          \begin{enumerate}
+              \item The graph might already be strongly connected.
+          \end{enumerate}
+
 
 \end{enumerate}
 \newpage
