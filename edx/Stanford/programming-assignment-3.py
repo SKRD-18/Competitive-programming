@@ -77,7 +77,7 @@ def kargers_cut(edgeslist: typing.List[typing.List[int]]) -> int:
 
 if __name__ == "__main__":
     edgeslist = read_edgeslist(
-        "/home/shiva/Projects/Competitive-programming/edx/Stanford/data/Programming-Assignment-3.txt"
+        "/Users/shiva/Documents/Competitive-programming/edx/Stanford/data/Programming-Assignment-3.txt"
     )
     print(edgeslist[:10])
     print(kargers_cut(edgeslist))

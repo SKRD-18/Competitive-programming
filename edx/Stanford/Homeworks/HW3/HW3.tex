@@ -77,9 +77,9 @@ This occurs if the pivot falls in the "middle" of the sorted sequence.
 	\item \textbf{Bad Pivot (Left):} If $p$ is among the smallest $(1-\alpha)n$ elements, the right partition will be larger than $\alpha n$.
 	\item \textbf{Bad Pivot (Right):} If $p$ is among the largest $(1-\alpha)n$ elements, the left partition will be larger than $\alpha n$.
 \end{itemize}
-The "Good Pivot" range is the indices between $(1-\alpha)n$ and $\alpha n$.
+The Good Pivot range is the indices between $(1-\alpha)n$ and $\alpha n$.
 \[
-	\text{Size of Good Range} = \alpha n - (1 - \alpha)n = (2\alpha - 1)n
+	\text{Size of Good Range} = \alpha n - (1 - \alpha)n = (2\alpha - 1)n = 2\alpha n - n
 \]
 Since the pivot is chosen uniformly from $n$ elements:
 \[
@@ -148,9 +148,14 @@ Since we fix $s$ and iterate through all other nodes, the number of calls is $n-
 
 \textbf{Problem:} Prove that the worst-case expected running time of every randomized comparison-based sorting algorithm is $\Omega(n \log n)$.
 
-\textbf{Solution:}
+\smallskip
 
-To prove this, we utilize \textbf{Yao's Minimax Principle}, which allows us to establish a lower bound on the worst-case expected cost of a randomized algorithm by analyzing the average-case cost of a deterministic algorithm over a specific input distribution.
+
+\textbf{Solution:} To prove this, we utilize \textbf{Yao's Minimax Principle}, which allows us to establish a lower bound on the worst-case expected cost of a randomized algorithm by analyzing the average-case cost of a deterministic algorithm over a specific input distribution.
+
+\smallskip
+
+\textbf{Key Idea:} The average performance of a randomized algorithm on its single worst-case input ... is the same as ... The average performance of the best possible deterministic algorithm on a randomly shuffled input.
 
 \begin{enumerate}
 	\item \textbf{Definitions:}
@@ -184,6 +189,9 @@ To prove this, we utilize \textbf{Yao's Minimax Principle}, which allows us to e
 \end{enumerate}
 
 \hrulefill
+
+% Move to next page 
+\newpage
 
 \section*{Optional Problem 2: Deterministic Selection with Different Group Sizes}
 
