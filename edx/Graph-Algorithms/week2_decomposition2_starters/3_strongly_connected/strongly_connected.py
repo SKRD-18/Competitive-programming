@@ -51,7 +51,6 @@ def number_of_strongly_connected_components(adj):
     # reset the visited array for the second pass
     visited = [False] * len(adj)
     for key in list(sorted_desc.keys()):
-        s = 0  # current source vertex; reset the s variable
         if not visited[key]:
             s = key
             dfs_second_pass(adj, key)
